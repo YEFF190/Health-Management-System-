@@ -16,7 +16,7 @@ public class DBConnection {
                                          + "?useSSL=false&allowPublicKeyRetrieval=true"
                                          + "&serverTimezone=UTC";
     private static final String USER     = "root";
-    private static final String PASSWORD = "yann237python";
+    private static final String PASSWORD = "";
 
     public static Connection getConnection() {
         try {
