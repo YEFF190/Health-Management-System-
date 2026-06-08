@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.*?>
+
+<!--
+    LOGIN — Split-screen layout.
+    Left: deep green identity panel with clinic context.
+    Right: clean white form panel.
+    No centered auth-card — the whole screen IS the layout.
+-->
+<HBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="controllers.LoginController"
+      stylesheets="@../application/application.css">
+
+    <!-- ══ LEFT PANEL — Identity & Trust ══ -->
+    <VBox styleClass="auth-panel-left"
+          alignment="CENTER"
+          spacing="0"
+          prefWidth="420">
+
+        <VBox alignment="CENTER_LEFT" maxWidth="300" spacing="0"
+              style="-fx-padding: 0 0 0 0;">
+
+            <!-- Logo mark: horizontal rule + name -->
+            <HBox alignment="CENTER_LEFT" spacing="14" style="-fx-padding: 0 0 36 0;">
+                <Rectangle width="5" height="44"
+                           fill="#74c69d" arcWidth="5" arcHeight="5"/>
+                <VBox spacing="4">
+                    <Label text="Vital Sync"
+                           style="-fx-font-family:'Palatino Linotype','Book Antiqua',Georgia,serif;
+                                  -fx-font-size:26px; -fx-font-weight:bold; -fx-text-fill:white;"/>
+                    <Label text="CLINICAL MANAGEMENT SYSTEM"
+                           style="-fx-font-family:'Consolas','Courier New',monospace;
+                                  -fx-font-size:9px; -fx-text-fill:rgba(255,255,255,0.40);
+                                  -fx-letter-spacing:2px;"/>
+                </VBox>
+            </HBox>
+
+            <!-- Tagline -->
+            <Label text="Care, coordinated."
+                   style="-fx-font-family:'Palatino Linotype',Georgia,serif;
+                          -fx-font-size:34px; -fx-font-weight:bold;
+                          -fx-text-fill:white; -fx-wrap-text:true;
+                          -fx-max-width:280px;"/>
+            <Label text="Connecting doctors, patients, and administrators in one trusted platform."
+                   style="-fx-font-size:13px; -fx-text-fill:rgba(255,255,255,0.58);
+                          -fx-wrap-text:true; -fx-max-width:280px; -fx-padding:16 0 48 0;
+                          -fx-line-spacing:3px;"/>
+
+            <!-- Feature list -->
+            <VBox spacing="14">
+                <HBox spacing="12" alignment="CENTER_LEFT">
+                    <Rectangle width="8" height="8" arcWidth="8" arcHeight="8" fill="#74c69d"/>
+                    <Label text="Appointment scheduling &amp; reminders"
+                           style="-fx-text-fill:rgba(255,255,255,0.68); -fx-font-size:13px;"/>
+                </HBox>
+                <HBox spacing="12" alignment="CENTER_LEFT">
+                    <Rectangle width="8" height="8" arcWidth="8" arcHeight="8" fill="#74c69d"/>
+                    <Label text="Secure medical record management"
+                           style="-fx-text-fill:rgba(255,255,255,0.68); -fx-font-size:13px;"/>
+                </HBox>
+                <HBox spacing="12" alignment="CENTER_LEFT">
+                    <Rectangle width="8" height="8" arcWidth="8" arcHeight="8" fill="#74c69d"/>
+                    <Label text="Role-based access for every user"
+                           style="-fx-text-fill:rgba(255,255,255,0.68); -fx-font-size:13px;"/>
+                </HBox>
+            </VBox>
+        </VBox>
+    </VBox>
+
+    <!-- ══ RIGHT PANEL — Sign In Form ══ -->
+    <VBox styleClass="auth-panel-right"
+          alignment="CENTER"
+          HBox.hgrow="ALWAYS"
+          spacing="0">
+
+        <VBox alignment="CENTER_LEFT" maxWidth="360"
+              spacing="0" style="-fx-padding:0;">
+
+            <!-- Header -->
+            <Label text="Welcome back"
+                   style="-fx-font-family:'Palatino Linotype','Book Antiqua',Georgia,serif;
+                          -fx-font-size:28px; -fx-font-weight:bold; -fx-text-fill:#2c2825;"/>
+            <Label text="Sign in to your account to continue."
+                   style="-fx-font-size:13px; -fx-text-fill:#7a706b; -fx-padding:6 0 40 0;"/>
+
+            <!-- Form fields -->
+            <Label text="Email address" styleClass="label-muted" style="-fx-padding:0 0 6 0;"/>
+            <TextField fx:id="emailField" promptText="you@hospital.org"
+                       prefWidth="360" maxWidth="360"/>
+
+            <Label text="Password" styleClass="label-muted" style="-fx-padding:20 0 6 0;"/>
+            <PasswordField fx:id="passwordField" promptText="Your password"
+                           prefWidth="360" maxWidth="360"/>
+
+            <!-- Sign in button -->
+            <Button text="Sign in" prefWidth="360" maxWidth="360"
+                    onAction="#handleLogin"
+                    style="-fx-padding:13 0 13 0; -fx-font-size:14px;"
+                    styleClass="button">
+                <VBox.margin><Insets top="28"/></VBox.margin>
+            </Button>
+
+            <!-- Status label -->
+            <Label fx:id="statusLabel" text=""
+                   styleClass="status-error"
+                   wrapText="true" maxWidth="360"
+                   style="-fx-padding:10 0 0 0;"/>
+
+            <!-- Divider -->
+            <HBox alignment="CENTER" spacing="12" style="-fx-padding:28 0 22 0;" maxWidth="360">
+                <Region HBox.hgrow="ALWAYS"
+                        style="-fx-border-color:rgba(44,40,37,0.12);
+                               -fx-border-width:1 0 0 0; -fx-pref-height:1;"/>
+                <Label text="or" styleClass="label-muted"/>
+                <Region HBox.hgrow="ALWAYS"
+                        style="-fx-border-color:rgba(44,40,37,0.12);
+                               -fx-border-width:1 0 0 0; -fx-pref-height:1;"/>
+            </HBox>
+
+            <!-- Register link -->
+            <Label text="New to HealthAssist? Register as administrator."
+                   style="-fx-font-size:13px; -fx-text-fill:#7a706b;"/>
+            <Hyperlink text="Create an administrator account →"
+                       onAction="#goToRegister"
+                       style="-fx-padding:4 0 0 0; -fx-font-size:13px;"/>
+        </VBox>
+    </VBox>
+
+</HBox>

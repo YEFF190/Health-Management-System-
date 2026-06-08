@@ -1,0 +1,721 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="controllers.AdminController"
+            stylesheets="@../application/application.css">
+
+    <!-- ══════════ SIDEBAR ══════════ -->
+    <left>
+        <VBox styleClass="sidebar" spacing="0">
+
+            <!-- Brand -->
+            <VBox style="-fx-padding:22 20 18 20;
+                         -fx-border-color:rgba(255,255,255,0.06);
+                         -fx-border-width:0 0 1 0;" spacing="2">
+                <HBox alignment="CENTER_LEFT" spacing="10">
+                    <Rectangle width="4" height="26" fill="#74c69d" arcWidth="4" arcHeight="4"/>
+                    <Label text="Vital Sync"
+                           style="-fx-font-family:'Palatino Linotype',Georgia,serif;
+                                  -fx-font-size:17px; -fx-font-weight:bold; -fx-text-fill:white;"/>
+                </HBox>
+                <Label text="ADMINISTRATION CONSOLE"
+                       style="-fx-font-family:'Consolas',monospace; -fx-font-size:8px;
+                              -fx-text-fill:rgba(255,255,255,0.30); -fx-letter-spacing:2px;
+                              -fx-padding:2 0 0 14;"/>
+            </VBox>
+
+            <!-- Navigation -->
+            <VBox spacing="1" style="-fx-padding:14 0 0 0;">
+                <Label text="MANAGEMENT" styleClass="sidebar-sub"
+                       style="-fx-padding:6 20 6 20;"/>
+                <Button fx:id="navAdmins"       text="👔  Admins"
+                        styleClass="nav-button,nav-button-active"
+                        maxWidth="Infinity" onAction="#navToAdmins"/>
+                <Button fx:id="navDoctors"      text="🩺  Doctors"
+                        styleClass="nav-button" maxWidth="Infinity" onAction="#navToDoctors"/>
+                <Button fx:id="navPatients"     text="👥  Patients"
+                        styleClass="nav-button" maxWidth="Infinity" onAction="#navToPatients"/>
+                <Button fx:id="navAppointments" text="📅  Appointments"
+                        styleClass="nav-button" maxWidth="Infinity" onAction="#navToAppointments"/>
+                <Button fx:id="navRecords"      text="📋  Medical Records"
+                        styleClass="nav-button" maxWidth="Infinity" onAction="#navToRecords"/>
+
+                <Label text="SETTINGS" styleClass="sidebar-sub"
+                       style="-fx-padding:16 20 6 20;"/>
+                <Button fx:id="navSpecialties"  text="🏥  Specialties"
+                        styleClass="nav-button" maxWidth="Infinity" onAction="#navToSpecialties"/>
+
+                <Label text="ACCOUNT" styleClass="sidebar-sub"
+                       style="-fx-padding:16 20 6 20;"/>
+                <Button fx:id="navMyInfo" text="👤  My Info"
+                        styleClass="nav-button" maxWidth="Infinity" onAction="#navToMyInfo"/>
+            </VBox>
+
+            <Region VBox.vgrow="ALWAYS"/>
+
+            <!-- User block -->
+            <VBox style="-fx-padding:14 16 18 16;
+                         -fx-border-color:rgba(255,255,255,0.06);
+                         -fx-border-width:1 0 0 0;
+                         -fx-background-color:rgba(0,0,0,0.15);"
+                  spacing="8">
+                <HBox alignment="CENTER_LEFT" spacing="10">
+                    <StackPane minWidth="36" minHeight="36" maxWidth="36" maxHeight="36"
+                               style="-fx-background-color:rgba(116,198,157,0.18);
+                                      -fx-background-radius:18;">
+                        <Label text="A"
+                               style="-fx-text-fill:#74c69d; -fx-font-weight:bold;
+                                      -fx-font-size:14px;"/>
+                    </StackPane>
+                    <VBox spacing="2">
+                        <Label fx:id="welcomeLabel" text="Admin"
+                               style="-fx-text-fill:white; -fx-font-weight:bold; -fx-font-size:13px;"/>
+                        <Label text="ADMINISTRATOR" styleClass="badge-admin"
+                               style="-fx-font-size:9px;"/>
+                    </VBox>
+                </HBox>
+                <Button text="Sign out" onAction="#handleLogout"
+                        style="-fx-background-color:transparent;
+                               -fx-text-fill:rgba(255,100,80,0.75);
+                               -fx-border-color:rgba(255,100,80,0.25);
+                               -fx-border-radius:6; -fx-background-radius:6;
+                               -fx-padding:6 14 6 14; -fx-cursor:hand;
+                               -fx-font-size:12px; -fx-pref-width:224px;"/>
+            </VBox>
+        </VBox>
+    </left>
+
+    <!-- ══════════ MAIN CONTENT ══════════ -->
+    <center>
+        <VBox spacing="0" VBox.vgrow="ALWAYS" style="-fx-background-color:#f5f1ed;">
+
+            <!-- Top bar -->
+            <HBox alignment="CENTER_LEFT" spacing="14"
+                  style="-fx-background-color:white; -fx-padding:12 24 12 24;
+                         -fx-border-color:rgba(44,40,37,0.09); -fx-border-width:0 0 1 0;">
+                <VBox spacing="1">
+                    <Label text="Admin Dashboard"
+                           style="-fx-font-family:'Palatino Linotype',Georgia,serif;
+                                  -fx-font-size:16px; -fx-font-weight:bold; -fx-text-fill:#2c2825;"/>
+                    <Label text="Full system access" styleClass="label-muted"/>
+                </VBox>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Label fx:id="reminderLabel" text=""
+                       styleClass="reminder-text"
+                       style="-fx-background-color:#fef3e2;
+                              -fx-background-radius:6;
+                              -fx-border-color:rgba(192,122,26,0.30);
+                              -fx-border-radius:6; -fx-border-width:1;
+                              -fx-padding:6 14 6 14;"
+                       wrapText="false"/>
+                <Button text="↺  Refresh" onAction="#handleRefresh" styleClass="btn-outline"/>
+                <fx:include fx:id="notifPanel" source="notification_panel.fxml"/>
+            </HBox>
+
+            <!-- Body -->
+            <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS" styleClass="scroll-pane">
+                <VBox spacing="20" style="-fx-padding:24;">
+
+                    <!-- ── Stat Row ── -->
+                    <HBox spacing="14">
+                        <VBox styleClass="stat-card" spacing="5" HBox.hgrow="ALWAYS">
+                            <Label text="PATIENTS" styleClass="stat-label"/>
+                            <Label fx:id="totalPatientsLabel" text="—" styleClass="stat-value,stat-mint"/>
+                            <Rectangle width="32" height="2" arcWidth="2" arcHeight="2" fill="#2d6a4f"/>
+                        </VBox>
+                        <VBox styleClass="stat-card" spacing="5" HBox.hgrow="ALWAYS">
+                            <Label text="DOCTORS" styleClass="stat-label"/>
+                            <Label fx:id="totalDoctorsLabel" text="—" styleClass="stat-value,stat-blue"/>
+                            <Rectangle width="32" height="2" arcWidth="2" arcHeight="2" fill="#2258a8"/>
+                        </VBox>
+                        <VBox styleClass="stat-card" spacing="5" HBox.hgrow="ALWAYS">
+                            <Label text="APPOINTMENTS" styleClass="stat-label"/>
+                            <Label fx:id="totalAppointmentsLabel" text="—" styleClass="stat-value,stat-warn"/>
+                            <Rectangle width="32" height="2" arcWidth="2" arcHeight="2" fill="#c07a1a"/>
+                        </VBox>
+                        <VBox styleClass="stat-card" spacing="5" HBox.hgrow="ALWAYS">
+                            <Label text="OPEN RECORDS" styleClass="stat-label"/>
+                            <Label fx:id="openRecordsLabel" text="—" styleClass="stat-value,stat-red"/>
+                            <Rectangle width="32" height="2" arcWidth="2" arcHeight="2" fill="#b83232"/>
+                        </VBox>
+                    </HBox>
+
+                    <!-- ── Tab Pane ── -->
+                    <TabPane fx:id="mainTabPane" tabClosingPolicy="UNAVAILABLE"
+                             style="-fx-background-color:transparent; -fx-tab-min-width:100px;">
+
+                        <!-- ══ ADMINS ══ -->
+                        <Tab text="👔  Admins">
+                            <VBox spacing="18">
+                                <VBox styleClass="card" spacing="0">
+                                    <HBox alignment="CENTER_LEFT" styleClass="card-header" spacing="12">
+                                        <VBox spacing="1">
+                                            <Label text="Group Administrators" styleClass="panel-title"/>
+                                            <Label text="All admins sharing your group" styleClass="label-muted"/>
+                                        </VBox>
+                                        <Region HBox.hgrow="ALWAYS"/>
+                                        <Button text="Delete selected" onAction="#handleDeleteAdmin" styleClass="btn-danger"/>
+                                    </HBox>
+                                    <TableView fx:id="adminsTable" prefHeight="190">
+                                        <columns>
+                                            <TableColumn fx:id="colAdminName"  text="NAME"  prefWidth="230"/>
+                                            <TableColumn fx:id="colAdminEmail" text="EMAIL" prefWidth="280"/>
+                                            <TableColumn fx:id="colAdminPhone" text="PHONE" prefWidth="170"/>
+                                        </columns>
+                                        <placeholder><Label text="No other administrators." styleClass="label-muted"/></placeholder>
+                                    </TableView>
+                                </VBox>
+
+                                <VBox styleClass="card" spacing="0">
+                                    <VBox styleClass="card-header" spacing="1">
+                                        <Label text="Add administrator" styleClass="panel-title"/>
+                                        <Label text="New admin will share your group and have equal access" styleClass="label-muted"/>
+                                    </VBox>
+                                    <VBox spacing="16" style="-fx-padding:20;">
+                                        <HBox spacing="14">
+                                            <VBox spacing="5" HBox.hgrow="ALWAYS">
+                                                <Label text="Full name *" styleClass="label-muted"/>
+                                                <TextField fx:id="newAdminName" promptText="Administrator name"/>
+                                            </VBox>
+                                            <VBox spacing="5" HBox.hgrow="ALWAYS">
+                                                <Label text="Email address *" styleClass="label-muted"/>
+                                                <TextField fx:id="newAdminEmail" promptText="admin@clinic.com"/>
+                                            </VBox>
+                                        </HBox>
+                                        <HBox spacing="14">
+                                            <VBox spacing="5" HBox.hgrow="ALWAYS">
+                                                <Label text="Phone" styleClass="label-muted"/>
+                                                <TextField fx:id="newAdminPhone" promptText="Optional"/>
+                                            </VBox>
+                                            <VBox spacing="5" HBox.hgrow="ALWAYS">
+                                                <Label text="Password" styleClass="label-muted"/>
+                                                <PasswordField fx:id="newAdminPassword" promptText="Leave blank for temp password"/>
+                                            </VBox>
+                                        </HBox>
+                                        <HBox spacing="12" alignment="CENTER_LEFT">
+                                            <Button text="Add administrator" onAction="#handleRegisterAdmin" styleClass="button"/>
+                                            <Label fx:id="adminRegStatusLabel" text="" style="-fx-font-size:12.5px;"/>
+                                        </HBox>
+                                    </VBox>
+                                </VBox>
+                            </VBox>
+                        </Tab>
+
+                        <!-- ══ DOCTORS ══ -->
+                        <Tab text="🩺  Doctors">
+                            <VBox spacing="18">
+                                <VBox styleClass="card" spacing="0">
+                                    <HBox alignment="CENTER_LEFT" styleClass="card-header" spacing="12">
+                                        <VBox spacing="1">
+                                            <Label text="Medical Staff" styleClass="panel-title"/>
+                                            <Label text="Doctors registered in your clinic" styleClass="label-muted"/>
+                                        </VBox>
+                                        <Region HBox.hgrow="ALWAYS"/>
+                                        <Button text="Delete selected" onAction="#handleDeleteDoctor" styleClass="btn-danger"/>
+                                    </HBox>
+                                    <TableView fx:id="doctorsTable" prefHeight="190">
+                                        <columns>
+                                            <TableColumn fx:id="colDocName"      text="NAME"      prefWidth="200"/>
+                                            <TableColumn fx:id="colDocEmail"     text="EMAIL"     prefWidth="230"/>
+                                            <TableColumn fx:id="colDocPhone"     text="PHONE"     prefWidth="145"/>
+                                            <TableColumn fx:id="colDocSpecialty" text="SPECIALTY" prefWidth="185"/>
+                                        </columns>
+                                        <placeholder><Label text="No doctors registered yet." styleClass="label-muted"/></placeholder>
+                                    </TableView>
+
+                                    <!-- Edit section -->
+                                    <VBox spacing="14" style="-fx-padding:18 20 20 20;
+                                                              -fx-border-color:rgba(44,40,37,0.07);
+                                                              -fx-border-width:1 0 0 0;">
+                                        <Label text="Edit selected doctor"
+                                               style="-fx-font-size:12px; -fx-font-weight:bold; -fx-text-fill:#2d6a4f;"/>
+                                        <HBox spacing="14">
+                                            <VBox spacing="5" HBox.hgrow="ALWAYS">
+                                                <Label text="Name" styleClass="label-muted"/>
+                                                <TextField fx:id="editDocNameField" promptText="Full name"/>
+                                            </VBox>
+                                            <VBox spacing="5" HBox.hgrow="ALWAYS">
+                                                <Label text="Phone" styleClass="label-muted"/>
+                                                <TextField fx:id="editDocPhoneField" promptText="Phone"/>
+                                            </VBox>
+                                            <VBox spacing="5" HBox.hgrow="ALWAYS">
+                                                <Label text="Specialty" styleClass="label-muted"/>
+                                                <ComboBox fx:id="editDocSpecialtyCombo" promptText="Select specialty" prefWidth="200"/>
+                                            </VBox>
+                                        </HBox>
+                                        <HBox spacing="12" alignment="CENTER_LEFT">
+                                            <Button text="Save changes" onAction="#handleUpdateDoctor"
+                                                    style="-fx-background-color:#2258a8; -fx-text-fill:white;
+                                                           -fx-font-weight:bold; -fx-background-radius:7;
+                                                           -fx-padding:9 20 9 20; -fx-cursor:hand;
+                                                           -fx-border-width:0; -fx-font-size:12.5px;"/>
+                                            <Label fx:id="editDocStatusLabel" text="" style="-fx-font-size:12.5px;"/>
+                                        </HBox>
+                                    </VBox>
+                                </VBox>
+
+                                <!-- Register doctor -->
+                                <VBox styleClass="card" spacing="0">
+                                    <VBox styleClass="card-header" spacing="1">
+                                        <Label text="Register new doctor" styleClass="panel-title"/>
+                                        <Label text="Doctors can log in with their email and password" styleClass="label-muted"/>
+                                    </VBox>
+                                    <VBox spacing="16" style="-fx-padding:20;">
+                                        <HBox spacing="14">
+                                            <VBox spacing="5" HBox.hgrow="ALWAYS">
+                                                <Label text="Full name *" styleClass="label-muted"/>
+                                                <TextField fx:id="docNameField" promptText="Dr. Jane Smith"/>
+                                            </VBox>
+                                            <VBox spacing="5" HBox.hgrow="ALWAYS">
+                                                <Label text="Email address *" styleClass="label-muted"/>
+                                                <TextField fx:id="docEmailField" promptText="jane@clinic.com"/>
+                                            </VBox>
+                                            <VBox spacing="5" HBox.hgrow="ALWAYS">
+                                                <Label text="Specialty *" styleClass="label-muted"/>
+                                                <ComboBox fx:id="docSpecialtyCombo" promptText="Select specialty" prefWidth="200"/>
+                                            </VBox>
+                                        </HBox>
+                                        <HBox spacing="14">
+                                            <VBox spacing="5" HBox.hgrow="ALWAYS">
+                                                <Label text="Phone" styleClass="label-muted"/>
+                                                <TextField fx:id="docPhoneField" promptText="+237 6XX XXX XXX"/>
+                                            </VBox>
+                                            <VBox spacing="5" HBox.hgrow="ALWAYS">
+                                                <Label text="Password" styleClass="label-muted"/>
+                                                <PasswordField fx:id="docPasswordField" promptText="Leave blank for temp password"/>
+                                            </VBox>
+                                            <VBox HBox.hgrow="ALWAYS"/>
+                                        </HBox>
+                                        <HBox spacing="12" alignment="CENTER_LEFT">
+                                            <Button text="Register doctor" onAction="#handleRegisterDoctor" styleClass="button"/>
+                                            <Label fx:id="docStatusLabel" text="" style="-fx-font-size:12.5px;"/>
+                                        </HBox>
+                                    </VBox>
+                                </VBox>
+                            </VBox>
+                        </Tab>
+
+                        <!-- ══ PATIENTS ══ -->
+                        <Tab text="👥  Patients">
+                            <VBox spacing="18">
+                                <VBox styleClass="card" spacing="0">
+                                    <HBox alignment="CENTER_LEFT" styleClass="card-header" spacing="12">
+                                        <VBox spacing="1">
+                                            <Label text="Patient Directory" styleClass="panel-title"/>
+                                            <Label text="All patients registered in your clinic" styleClass="label-muted"/>
+                                        </VBox>
+                                        <Region HBox.hgrow="ALWAYS"/>
+                                        <Button text="Delete selected" onAction="#handleDeletePatient" styleClass="btn-danger"/>
+                                    </HBox>
+                                    <TableView fx:id="patientsTable" prefHeight="190">
+                                        <columns>
+                                            <TableColumn fx:id="colPatName"   text="NAME"   prefWidth="180"/>
+                                            <TableColumn fx:id="colPatEmail"  text="EMAIL"  prefWidth="200"/>
+                                            <TableColumn fx:id="colPatPhone"  text="PHONE"  prefWidth="130"/>
+                                            <TableColumn fx:id="colPatGender" text="GENDER" prefWidth="95"/>
+                                            <TableColumn fx:id="colPatDob"    text="DOB"    prefWidth="120"/>
+                                        </columns>
+                                        <placeholder><Label text="No patients registered yet." styleClass="label-muted"/></placeholder>
+                                    </TableView>
+
+                                    <!-- Edit inline -->
+                                    <VBox spacing="14" style="-fx-padding:18 20 20 20;
+                                                              -fx-border-color:rgba(44,40,37,0.07);
+                                                              -fx-border-width:1 0 0 0;">
+                                        <Label text="Edit selected patient"
+                                               style="-fx-font-size:12px; -fx-font-weight:bold; -fx-text-fill:#2d6a4f;"/>
+                                        <HBox spacing="14">
+                                            <VBox spacing="5" HBox.hgrow="ALWAYS">
+                                                <Label text="Name" styleClass="label-muted"/>
+                                                <TextField fx:id="editPatNameField" promptText="Full name"/>
+                                            </VBox>
+                                            <VBox spacing="5" HBox.hgrow="ALWAYS">
+                                                <Label text="Phone" styleClass="label-muted"/>
+                                                <TextField fx:id="editPatPhoneField" promptText="Phone"/>
+                                            </VBox>
+                                            <VBox spacing="5" HBox.hgrow="ALWAYS">
+                                                <Label text="Gender" styleClass="label-muted"/>
+                                                <ComboBox fx:id="editPatGenderCombo" prefWidth="130"/>
+                                            </VBox>
+                                        </HBox>
+                                        <HBox spacing="14">
+                                            <VBox spacing="5" HBox.hgrow="ALWAYS">
+                                                <Label text="Date of birth" styleClass="label-muted"/>
+                                                <DatePicker fx:id="editPatDobPicker" prefWidth="160"/>
+                                            </VBox>
+                                            <VBox spacing="5" HBox.hgrow="ALWAYS">
+                                                <Label text="Height (cm)" styleClass="label-muted"/>
+                                                <TextField fx:id="editPatHeightField" promptText="e.g. 175"/>
+                                            </VBox>
+                                            <VBox spacing="5" HBox.hgrow="ALWAYS">
+                                                <Label text="Weight (kg)" styleClass="label-muted"/>
+                                                <TextField fx:id="editPatWeightField" promptText="e.g. 70"/>
+                                            </VBox>
+                                        </HBox>
+                                        <HBox spacing="12" alignment="CENTER_LEFT">
+                                            <Button text="Save changes" onAction="#handleUpdatePatient"
+                                                    style="-fx-background-color:#2258a8; -fx-text-fill:white;
+                                                           -fx-font-weight:bold; -fx-background-radius:7;
+                                                           -fx-padding:9 20 9 20; -fx-cursor:hand;
+                                                           -fx-border-width:0; -fx-font-size:12.5px;"/>
+                                            <Label fx:id="editPatStatusLabel" text="" style="-fx-font-size:12.5px;"/>
+                                        </HBox>
+                                    </VBox>
+                                </VBox>
+
+                                <!-- Register patient -->
+                                <VBox styleClass="card" spacing="0">
+                                    <VBox styleClass="card-header" spacing="1">
+                                        <Label text="Register new patient" styleClass="panel-title"/>
+                                        <Label text="Patients can log in to view their records" styleClass="label-muted"/>
+                                    </VBox>
+                                    <VBox spacing="16" style="-fx-padding:20;">
+                                        <HBox spacing="14">
+                                            <VBox spacing="5" HBox.hgrow="ALWAYS">
+                                                <Label text="Full name *" styleClass="label-muted"/>
+                                                <TextField fx:id="patNameField" promptText="Patient name"/>
+                                            </VBox>
+                                            <VBox spacing="5" HBox.hgrow="ALWAYS">
+                                                <Label text="Email address *" styleClass="label-muted"/>
+                                                <TextField fx:id="patEmailField" promptText="patient@email.com"/>
+                                            </VBox>
+                                            <VBox spacing="5" HBox.hgrow="ALWAYS">
+                                                <Label text="Gender *" styleClass="label-muted"/>
+                                                <ComboBox fx:id="patGenderCombo" promptText="Select" prefWidth="140"/>
+                                            </VBox>
+                                        </HBox>
+                                        <HBox spacing="14">
+                                            <VBox spacing="5" HBox.hgrow="ALWAYS">
+                                                <Label text="Date of birth" styleClass="label-muted"/>
+                                                <DatePicker fx:id="patDobPicker" prefWidth="170"/>
+                                            </VBox>
+                                            <VBox spacing="5" HBox.hgrow="ALWAYS">
+                                                <Label text="Phone" styleClass="label-muted"/>
+                                                <TextField fx:id="patPhoneField" promptText="+237 6XX XXX XXX"/>
+                                            </VBox>
+                                            <VBox spacing="5" HBox.hgrow="ALWAYS">
+                                                <Label text="Height (cm)" styleClass="label-muted"/>
+                                                <TextField fx:id="patHeightField" promptText="e.g. 175"/>
+                                            </VBox>
+                                            <VBox spacing="5" HBox.hgrow="ALWAYS">
+                                                <Label text="Weight (kg)" styleClass="label-muted"/>
+                                                <TextField fx:id="patWeightField" promptText="e.g. 70"/>
+                                            </VBox>
+                                        </HBox>
+                                        <HBox spacing="14">
+                                            <VBox spacing="5">
+                                                <Label text="Password" styleClass="label-muted"/>
+                                                <PasswordField fx:id="patPasswordField"
+                                                               promptText="Leave blank for temp password"
+                                                               prefWidth="320"/>
+                                            </VBox>
+                                        </HBox>
+                                        <HBox spacing="12" alignment="CENTER_LEFT">
+                                            <Button text="Register patient" onAction="#handleRegisterPatient" styleClass="button"/>
+                                            <Label fx:id="patStatusLabel" text="" style="-fx-font-size:12.5px;"/>
+                                        </HBox>
+                                    </VBox>
+                                </VBox>
+                            </VBox>
+                        </Tab>
+
+                        <!-- ══ APPOINTMENTS ══ -->
+                        <Tab text="📅  Appointments">
+                            <VBox spacing="18">
+
+                                <!-- Archive controls -->
+                                <HBox styleClass="card" spacing="14" alignment="CENTER_LEFT"
+                                      style="-fx-padding:14 20 14 20;">
+                                    <VBox spacing="2" HBox.hgrow="ALWAYS">
+                                        <Label text="History Management" styleClass="panel-title"/>
+                                        <Label text="Archive hides completed/cancelled from view. Purge permanently deletes archived data."
+                                               styleClass="label-muted" wrapText="true"/>
+                                    </VBox>
+                                    <Button text="📦  Archive completed"
+                                            onAction="#handleArchiveHistory"
+                                            style="-fx-background-color:#fef3e2;
+                                                   -fx-text-fill:#c07a1a;
+                                                   -fx-border-color:rgba(192,122,26,0.30);
+                                                   -fx-border-width:1; -fx-border-radius:7;
+                                                   -fx-background-radius:7; -fx-padding:9 18 9 18;
+                                                   -fx-cursor:hand; -fx-font-weight:bold;
+                                                   -fx-font-size:12.5px;"/>
+                                    <Button text="🗑  Purge archived"
+                                            onAction="#handlePurgeArchived"
+                                            styleClass="btn-danger"/>
+                                    <Label fx:id="archiveStatusLabel" text=""
+                                           style="-fx-font-size:12px;"/>
+                                </HBox>
+
+                                <VBox styleClass="card" spacing="0">
+                                    <HBox alignment="CENTER_LEFT" styleClass="card-header" spacing="10">
+                                        <VBox spacing="1">
+                                            <Label text="All Appointments" styleClass="panel-title"/>
+                                            <Label text="Select a row then confirm or cancel" styleClass="label-muted"/>
+                                        </VBox>
+                                        <Region HBox.hgrow="ALWAYS"/>
+                                        <Button text="✓ Confirm selected"
+                                                onAction="#handleConfirmAppointment"
+                                                styleClass="btn-success"/>
+                                        <Button text="✕ Cancel selected"
+                                                onAction="#handleCancelAppointment"
+                                                styleClass="btn-danger"/>
+                                    </HBox>
+                                    <TableView fx:id="appointmentsTable" prefHeight="250">
+                                        <columns>
+                                            <TableColumn fx:id="colApptPatient" text="PATIENT" prefWidth="158"/>
+                                            <TableColumn fx:id="colApptDoctor"  text="DOCTOR"  prefWidth="158"/>
+                                            <TableColumn fx:id="colApptDate"    text="DATE"    prefWidth="112"/>
+                                            <TableColumn fx:id="colApptTime"    text="TIME"    prefWidth="88"/>
+                                            <TableColumn fx:id="colApptStatus"  text="STATUS"  prefWidth="110"/>
+                                            <TableColumn fx:id="colApptReason"  text="REASON"  prefWidth="200"/>
+                                        </columns>
+                                        <placeholder><Label text="No appointments on record." styleClass="label-muted"/></placeholder>
+                                    </TableView>
+                                </VBox>
+
+                                <!-- Create appointment — searchable pickers -->
+                                <VBox styleClass="card" spacing="0">
+                                    <VBox styleClass="card-header" spacing="1">
+                                        <Label text="Create appointment" styleClass="panel-title"/>
+                                        <Label text="Click the buttons to search and select a doctor or patient"
+                                               styleClass="label-muted"/>
+                                    </VBox>
+                                    <VBox spacing="16" style="-fx-padding:20;">
+                                        <HBox spacing="14">
+                                            <VBox spacing="5" HBox.hgrow="ALWAYS">
+                                                <Label text="Doctor *" styleClass="label-muted"/>
+                                                <Button fx:id="apptDoctorPickerBtn"
+                                                        text="Select doctor…"
+                                                        onAction="#showDoctorPicker"
+                                                        maxWidth="Infinity"
+                                                        style="-fx-background-color:white;
+                                                               -fx-border-color:rgba(44,40,37,0.18);
+                                                               -fx-border-radius:7; -fx-background-radius:7;
+                                                               -fx-border-width:1; -fx-alignment:CENTER-LEFT;
+                                                               -fx-padding:10 13 10 13; -fx-cursor:hand;
+                                                               -fx-font-size:13px; -fx-text-fill:#b5aca6;"/>
+                                            </VBox>
+                                            <VBox spacing="5" HBox.hgrow="ALWAYS">
+                                                <Label text="Patient *" styleClass="label-muted"/>
+                                                <Button fx:id="apptPatientPickerBtn"
+                                                        text="Select patient…"
+                                                        onAction="#showPatientPicker"
+                                                        maxWidth="Infinity"
+                                                        style="-fx-background-color:white;
+                                                               -fx-border-color:rgba(44,40,37,0.18);
+                                                               -fx-border-radius:7; -fx-background-radius:7;
+                                                               -fx-border-width:1; -fx-alignment:CENTER-LEFT;
+                                                               -fx-padding:10 13 10 13; -fx-cursor:hand;
+                                                               -fx-font-size:13px; -fx-text-fill:#b5aca6;"/>
+                                            </VBox>
+                                        </HBox>
+                                        <HBox spacing="14">
+                                            <VBox spacing="5">
+                                                <Label text="Date *" styleClass="label-muted"/>
+                                                <DatePicker fx:id="apptDatePicker" prefWidth="165"/>
+                                            </VBox>
+                                            <VBox spacing="5">
+                                                <Label text="Time (HH:mm) *" styleClass="label-muted"/>
+                                                <TextField fx:id="apptTimeField" promptText="09:30" prefWidth="100"/>
+                                            </VBox>
+                                            <VBox spacing="5" HBox.hgrow="ALWAYS">
+                                                <Label text="Reason *" styleClass="label-muted"/>
+                                                <TextField fx:id="apptReasonField" promptText="e.g. General check-up"/>
+                                            </VBox>
+                                        </HBox>
+                                        <HBox spacing="12" alignment="CENTER_LEFT">
+                                            <Button text="Create appointment" onAction="#handleCreateAppointment" styleClass="button"/>
+                                            <Label fx:id="apptStatusLabel" text="" wrapText="true"
+                                                   style="-fx-font-size:12.5px;"/>
+                                        </HBox>
+                                    </VBox>
+                                </VBox>
+                            </VBox>
+                        </Tab>
+
+                        <!-- ══ RECORDS ══ -->
+                        <Tab text="📋  Records">
+                            <VBox styleClass="card" spacing="0">
+                                <HBox alignment="CENTER_LEFT" styleClass="card-header" spacing="12">
+                                    <VBox spacing="1">
+                                        <Label text="Medical Records" styleClass="panel-title"/>
+                                        <Label text="Select a record to resolve it" styleClass="label-muted"/>
+                                    </VBox>
+                                    <Region HBox.hgrow="ALWAYS"/>
+                                    <Button text="Mark resolved" onAction="#handleResolveRecord"
+                                            style="-fx-background-color:#2258a8; -fx-text-fill:white;
+                                                   -fx-font-weight:bold; -fx-background-radius:7;
+                                                   -fx-padding:9 20 9 20; -fx-cursor:hand;
+                                                   -fx-border-width:0; -fx-font-size:12.5px;"/>
+                                </HBox>
+                                <TableView fx:id="recordsTable" prefHeight="480" VBox.vgrow="ALWAYS">
+                                    <columns>
+                                        <TableColumn fx:id="colRecPatient"   text="PATIENT"   prefWidth="185"/>
+                                        <TableColumn fx:id="colRecDoctor"    text="DOCTOR"    prefWidth="185"/>
+                                        <TableColumn fx:id="colRecDiagnosis" text="DIAGNOSIS" prefWidth="248"/>
+                                        <TableColumn fx:id="colRecDate"      text="DATE"      prefWidth="120"/>
+                                        <TableColumn fx:id="colRecStatus"    text="STATUS"    prefWidth="115"/>
+                                    </columns>
+                                    <placeholder><Label text="No medical records found." styleClass="label-muted"/></placeholder>
+                                </TableView>
+                            </VBox>
+                        </Tab>
+
+                        <!-- ══ SPECIALTIES ══ -->
+                        <Tab text="🏥  Specialties">
+                            <VBox spacing="18">
+                                <VBox styleClass="card" spacing="0">
+                                    <HBox alignment="CENTER_LEFT" styleClass="card-header" spacing="12">
+                                        <VBox spacing="1">
+                                            <Label text="Clinic Specialties" styleClass="panel-title"/>
+                                            <Label text="These specialties appear in doctor registration and profile editing"
+                                                   styleClass="label-muted"/>
+                                        </VBox>
+                                        <Region HBox.hgrow="ALWAYS"/>
+                                        <Button text="Delete selected" onAction="#handleDeleteSpecialty" styleClass="btn-danger"/>
+                                    </HBox>
+                                    <TableView fx:id="specialtiesTable" prefHeight="320">
+                                        <columns>
+                                            <TableColumn fx:id="colSpecName" text="SPECIALTY NAME" prefWidth="400"/>
+                                        </columns>
+                                        <placeholder>
+                                            <Label text="No specialties defined. Add one below." styleClass="label-muted"/>
+                                        </placeholder>
+                                    </TableView>
+                                </VBox>
+
+                                <VBox styleClass="card" spacing="0">
+                                    <VBox styleClass="card-header" spacing="1">
+                                        <Label text="Add specialty" styleClass="panel-title"/>
+                                        <Label text="Add a medical specialty relevant to your clinic" styleClass="label-muted"/>
+                                    </VBox>
+                                    <VBox spacing="16" style="-fx-padding:20;">
+                                        <HBox spacing="14" alignment="CENTER_LEFT">
+                                            <VBox spacing="5" HBox.hgrow="ALWAYS">
+                                                <Label text="Specialty name *" styleClass="label-muted"/>
+                                                <TextField fx:id="newSpecialtyField"
+                                                           promptText="e.g. Dermatology"/>
+                                            </VBox>
+                                            <VBox spacing="5" alignment="BOTTOM_LEFT">
+                                                <Label text=" " styleClass="label-muted"/>
+                                                <Button text="Add specialty" onAction="#handleAddSpecialty" styleClass="button"/>
+                                            </VBox>
+                                        </HBox>
+                                        <Label fx:id="specialtyStatusLabel" text="" style="-fx-font-size:12.5px;"/>
+                                    </VBox>
+                                </VBox>
+                            </VBox>
+                        </Tab>
+
+                        <!-- ══ MY INFO ══ -->
+                        <Tab text="👤  My Info">
+                            <VBox spacing="18">
+                                <HBox spacing="18">
+                                    <VBox styleClass="card" spacing="0" HBox.hgrow="ALWAYS">
+                                        <HBox styleClass="card-header">
+                                            <Label text="My Profile" styleClass="panel-title"/>
+                                        </HBox>
+                                        <VBox spacing="18" style="-fx-padding:20;">
+                                            <HBox alignment="CENTER_LEFT" spacing="16">
+                                                <StackPane minWidth="52" minHeight="52" maxWidth="52" maxHeight="52"
+                                                           style="-fx-background-color:#d8f3dc; -fx-background-radius:26;">
+                                                    <Label text="A"
+                                                           style="-fx-text-fill:#1a3d2e;
+                                                                  -fx-font-family:'Palatino Linotype',Georgia,serif;
+                                                                  -fx-font-size:22px; -fx-font-weight:bold;"/>
+                                                </StackPane>
+                                                <VBox spacing="4">
+                                                    <Label fx:id="infoNameLabel" text="—"
+                                                           style="-fx-font-family:'Palatino Linotype',Georgia,serif;
+                                                                  -fx-font-size:18px; -fx-font-weight:bold;
+                                                                  -fx-text-fill:#2c2825;"/>
+                                                    <Label text="ADMINISTRATOR" styleClass="badge-admin"/>
+                                                </VBox>
+                                            </HBox>
+                                            <VBox spacing="10">
+                                                <HBox spacing="12">
+                                                    <Label text="Email" styleClass="label-muted" minWidth="60"/>
+                                                    <Label fx:id="infoEmailLabel" text="—"
+                                                           style="-fx-text-fill:#2c2825; -fx-font-size:13px;"/>
+                                                </HBox>
+                                                <HBox spacing="12">
+                                                    <Label text="Phone" styleClass="label-muted" minWidth="60"/>
+                                                    <Label fx:id="infoPhoneLabel" text="—"
+                                                           style="-fx-text-fill:#2c2825; -fx-font-size:13px;"/>
+                                                </HBox>
+                                                <HBox spacing="12">
+                                                    <Label text="Role" styleClass="label-muted" minWidth="60"/>
+                                                    <Label fx:id="infoRoleLabel" text="Administrator"
+                                                           style="-fx-text-fill:#2d6a4f; -fx-font-size:13px;
+                                                                  -fx-font-weight:bold;"/>
+                                                </HBox>
+                                            </VBox>
+                                        </VBox>
+                                    </VBox>
+
+                                    <VBox styleClass="card" spacing="0" HBox.hgrow="ALWAYS">
+                                        <HBox styleClass="card-header">
+                                            <Label text="Edit info" styleClass="panel-title"/>
+                                        </HBox>
+                                        <VBox spacing="14" style="-fx-padding:20;">
+                                            <VBox spacing="5">
+                                                <Label text="Name *" styleClass="label-muted"/>
+                                                <TextField fx:id="editInfoNameField" promptText="Your full name"/>
+                                            </VBox>
+                                            <VBox spacing="5">
+                                                <Label text="Phone" styleClass="label-muted"/>
+                                                <TextField fx:id="editInfoPhoneField" promptText="Phone number"/>
+                                            </VBox>
+                                            <HBox spacing="12" alignment="CENTER_LEFT">
+                                                <Button text="Save changes" onAction="#handleUpdateInfo" styleClass="button"/>
+                                                <Label fx:id="infoUpdateStatusLabel" text="" style="-fx-font-size:12.5px;"/>
+                                            </HBox>
+                                        </VBox>
+                                    </VBox>
+                                </HBox>
+
+                                <VBox styleClass="card" spacing="0">
+                                    <HBox styleClass="card-header">
+                                        <Label text="Change password" styleClass="panel-title"/>
+                                    </HBox>
+                                    <VBox spacing="14" style="-fx-padding:20;">
+                                        <HBox spacing="14">
+                                            <VBox spacing="5" HBox.hgrow="ALWAYS">
+                                                <Label text="Current password" styleClass="label-muted"/>
+                                                <PasswordField fx:id="currentPwField" promptText="Current password"/>
+                                            </VBox>
+                                            <VBox spacing="5" HBox.hgrow="ALWAYS">
+                                                <Label text="New password" styleClass="label-muted"/>
+                                                <PasswordField fx:id="newPwField" promptText="Min. 6 characters"/>
+                                            </VBox>
+                                            <VBox spacing="5" HBox.hgrow="ALWAYS">
+                                                <Label text="Confirm new password" styleClass="label-muted"/>
+                                                <PasswordField fx:id="confirmPwField" promptText="Repeat new password"/>
+                                            </VBox>
+                                        </HBox>
+                                        <HBox spacing="12" alignment="CENTER_LEFT">
+                                            <Button text="Update password" onAction="#handleChangePassword"
+                                                    style="-fx-background-color:#2258a8; -fx-text-fill:white;
+                                                           -fx-font-weight:bold; -fx-background-radius:7;
+                                                           -fx-padding:9 20 9 20; -fx-cursor:hand;
+                                                           -fx-border-width:0; -fx-font-size:12.5px;"/>
+                                            <Label fx:id="pwStatusLabel" text="" style="-fx-font-size:12.5px;"/>
+                                        </HBox>
+                                    </VBox>
+                                </VBox>
+                            </VBox>
+                        </Tab>
+
+                    </TabPane>
+                </VBox>
+            </ScrollPane>
+        </VBox>
+    </center>
+
+</BorderPane>

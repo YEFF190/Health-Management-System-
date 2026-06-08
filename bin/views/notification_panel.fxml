@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<!--
+    Notification panel — embedded via fx:include in every dashboard.
+    Only the bell button and badge live here.
+    The dropdown is built as a Popup in NotificationController so it
+    floats above all other nodes and never gets clipped by the layout.
+-->
+<StackPane xmlns="http://javafx.com/javafx/17"
+           xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="controllers.NotificationController"
+           alignment="CENTER"
+           minWidth="44">
+
+    <StackPane>
+        <Button fx:id="bellButton"
+                text="🔔"
+                onAction="#toggleDropdown"
+                styleClass="notif-bell-btn"
+                style="-fx-font-size:16px;"/>
+        <Label fx:id="badgeLabel"
+               text="0"
+               visible="false"
+               managed="false"
+               styleClass="notif-badge"
+               StackPane.alignment="TOP_RIGHT"/>
+    </StackPane>
+
+</StackPane>
